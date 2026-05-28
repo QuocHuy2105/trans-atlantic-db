@@ -1,0 +1,170 @@
+=================================================================
+  Trans-Atlantic DB — Statistical Summary Report
+  Generated: 2026-05-28 16:03:22
+  Dataset  : analysis/benchmark_results.csv
+  Total    : 300 transactions (100 runs x 3 profiles)
+=================================================================
+
+=================================================================
+  SECTION 1: QUICK SUMMARY
+=================================================================
+
+  Profile           Mean    Median       P99    CoordCost
+  -------------------------------------------------------
+  local            93.2ms     96.6ms    127.9ms        9.3%
+  regional        501.7ms    507.1ms    540.0ms       79.8%
+  global         2106.6ms   2111.3ms   2133.1ms       94.9%
+
+=================================================================
+  SECTION 2: DETAILED STATISTICS PER PROFILE
+=================================================================
+
+  --- LOCAL (1ms one-way latency) ---
+
+  Total Transaction Time:
+    Count   : 100
+    Mean    : 93.22ms
+    Median  : 96.62ms
+    Std Dev : 23.28ms
+    Min     : 32.79ms
+    P25     : 73.57ms
+    P75     : 110.15ms
+    P95     : 122.91ms
+    P99     : 127.87ms
+    Max     : 130.84ms
+
+  Network Wait Time (sleep):
+    Mean    : 8.00ms
+    Std Dev : 0.00ms
+    Min/Max : 8.00ms / 8.00ms
+
+  Work Time (CPU + I/O):
+    Mean    : 85.22ms
+    Std Dev : 23.28ms
+    Min/Max : 24.79ms / 122.83ms
+
+  Cost of Coordination:
+    Mean    : 9.30%
+    Median  : 8.28%
+    Min/Max : 6.11% / 24.40%
+
+  Phase Breakdown (mean):
+    Phase 1 (Voting)  : 41.88ms
+    Phase 2 (Decision): 50.44ms
+
+  Success Rate: 100.0%
+
+  --- REGIONAL (50ms one-way latency) ---
+
+  Total Transaction Time:
+    Count   : 100
+    Mean    : 501.68ms
+    Median  : 507.09ms
+    Std Dev : 17.67ms
+    Min     : 436.93ms
+    P25     : 491.01ms
+    P75     : 510.07ms
+    P95     : 524.82ms
+    P99     : 539.96ms
+    Max     : 542.61ms
+
+  Network Wait Time (sleep):
+    Mean    : 400.00ms
+    Std Dev : 0.00ms
+    Min/Max : 400.00ms / 400.00ms
+
+  Work Time (CPU + I/O):
+    Mean    : 101.68ms
+    Std Dev : 17.67ms
+    Min/Max : 36.93ms / 142.61ms
+
+  Cost of Coordination:
+    Mean    : 79.83%
+    Median  : 78.88%
+    Min/Max : 73.72% / 91.55%
+
+  Phase Breakdown (mean):
+    Phase 1 (Voting)  : 245.41ms
+    Phase 2 (Decision): 255.06ms
+
+  Success Rate: 100.0%
+
+  --- GLOBAL (250ms one-way latency) ---
+
+  Total Transaction Time:
+    Count   : 100
+    Mean    : 2106.58ms
+    Median  : 2111.26ms
+    Std Dev : 15.93ms
+    Min     : 2061.41ms
+    P25     : 2097.23ms
+    P75     : 2118.22ms
+    P95     : 2122.53ms
+    P99     : 2133.10ms
+    Max     : 2137.51ms
+
+  Network Wait Time (sleep):
+    Mean    : 2000.00ms
+    Std Dev : 0.00ms
+    Min/Max : 2000.00ms / 2000.00ms
+
+  Work Time (CPU + I/O):
+    Mean    : 106.58ms
+    Std Dev : 15.93ms
+    Min/Max : 61.41ms / 137.51ms
+
+  Cost of Coordination:
+    Mean    : 94.95%
+    Median  : 94.73%
+    Min/Max : 93.57% / 97.02%
+
+  Phase Breakdown (mean):
+    Phase 1 (Voting)  : 1051.15ms
+    Phase 2 (Decision): 1054.10ms
+
+  Success Rate: 100.0%
+
+=================================================================
+  SECTION 3: OZSU COST MODEL ANALYSIS
+=================================================================
+
+  Formula: Total_Cost = TCPU x #insts + TIO x #IOs
+                      + TMSG x #messages + TTR x #bytes
+
+  In this experiment:
+    TMSG = simulated one-way latency
+    #messages per 2PC = 4N = 4 x 2 = 8
+
+  Profile          TMSG    Comm Cost    Work Cost      Total
+  ----------------------------------------------------------
+  local              1ms        8.0ms       85.2ms     93.2ms
+  regional          50ms      400.0ms      101.7ms    501.7ms
+  global           250ms     2000.0ms      106.6ms   2106.6ms
+
+  Observation:
+  - Work cost (CPU+IO): 85.2ms (local) vs 106.6ms (global)
+    => Constant, independent of network latency
+  - Comm cost        : 8.0ms (local) vs 2000.0ms (global)
+    => Increases 250x when latency goes from 1ms to 250ms
+  - At Global latency, Comm dominates: 18.8x more than Work cost
+
+=================================================================
+  SECTION 4: TAIL LATENCY ANALYSIS (P99)
+=================================================================
+
+  Profile         Median       P95       P99   P99 overhead
+  ----------------------------------------------------------
+  local            96.6ms    122.9ms    127.9ms         32.3%
+  regional        507.1ms    524.8ms    540.0ms          6.5%
+  global         2111.3ms   2122.5ms   2133.1ms          1.0%
+
+  Interpretation:
+  - Local: High P99 overhead (+32%) due to HTTP/OS jitter
+    being significant relative to small total time
+  - Global: Low P99 overhead (+1%) because deterministic
+    sleep() dominates — distribution becomes very tight
+  => Always report P99, not just Mean, in distributed systems
+
+=================================================================
+  End of Report — 2026-05-28 16:03:22
+=================================================================
