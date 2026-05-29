@@ -78,20 +78,20 @@ Total: 4N = 8 messages, each incurring one network delay
 
 | Profile  | Latency | Mean      | Median    | P99       |
 |----------|---------|-----------|-----------|-----------|
-| Local    | 1ms     | 93.2ms    | 96.6ms    | 127.9ms   |
-| Regional | 50ms    | 501.7ms   | 507.1ms   | 540.0ms   |
-| Global   | 250ms   | 2106.6ms  | 2111.3ms  | 2133.1ms  |
+| Local    | 1ms     | 79.4ms    | 77.0ms    | 125.3ms   |
+| Regional | 50ms    | 490.4ms   | 491.0ms   | 526.8ms   |
+| Global   | 250ms   | 2111.2ms  | 2113.4ms  | 2135.5ms  |
 
 ### 4.2 Cost of Coordination
 
 | Profile  | Network Wait | Work Time | CoordCost |
 |----------|-------------|-----------|-----------|
-| Local    | 8.0ms       | 85.2ms    | 9.3%      |
-| Regional | 400.0ms     | 101.7ms   | 79.8%     |
-| Global   | 2000.0ms    | 106.6ms   | 94.9%     |
+| Local    | 8.0ms       | 71.4ms    | 11.4%     |
+| Regional | 400.0ms     | 90.4ms    | 81.7%     |
+| Global   | 2000.0ms    | 111.2ms   | 94.7%     |
 
 **Key observation:** Work time remains approximately constant
-(~85–107ms) across all profiles. What changes dramatically is
+(~71–111ms) across all profiles. What changes dramatically is
 the network wait time — confirming that actual database operations
 are not the bottleneck in distributed transactions.
 
@@ -159,14 +159,14 @@ Our results demonstrate a key theorem from Chapter 5 of Özsu:
 
 At Global latency (250ms):
 
-- CPU + I/O work ≈ 106ms (constant, independent of network)
+- CPU + I/O work ≈ 111ms (constant, independent of network)
 - Communication cost = 2000ms (grows linearly with latency)
-- **CoordCost = 94.9%** — nearly 19× more time waiting than working
+- **CoordCost = 94.7%** — nearly 18× more time waiting than working
 
 This has profound practical implications: optimizing the database
 query (reducing CPU/IO cost) yields negligible benefit when the
 network latency is high. A 50% faster query at 250ms latency would
-only reduce total time from 2106ms to 2053ms — a 2.5% improvement.
+only reduce total time from 2111ms to ~2056ms — a 2.6% improvement.
 The real optimization must target the **number of messages (4N)**
 or the **latency itself**.
 
@@ -176,13 +176,13 @@ P99 represents the worst-case experience for 1 in 100 transactions:
 
 | Profile  | Median    | P99       | P99 Overhead |
 |----------|-----------|-----------|-------------|
-| Local    | 96.6ms    | 127.9ms   | +32.4%      |
-| Regional | 507.1ms   | 540.0ms   | +6.5%       |
-| Global   | 2111.3ms  | 2133.1ms  | +1.0%       |
+| Local    | 77.0ms    | 125.3ms   | +62.8%      |
+| Regional | 491.0ms   | 526.8ms   | +7.3%       |
+| Global   | 2113.4ms  | 2135.5ms  | +1.0%       |
 
 At high latency, P99 converges toward Median — the distribution
 becomes tight because the dominant cost (network sleep) is perfectly
-deterministic. At local latency, P99 shows higher variance (+32.4%)
+deterministic. At local latency, P99 shows higher variance (+62.8%)
 because HTTP overhead and OS scheduling jitter become relatively
 significant, confirming the need to report tail latency rather than
 averages alone.
@@ -212,12 +212,12 @@ This study empirically confirms the theoretical predictions of the
 1. **Communication cost scales linearly** with both latency and
    message count (4N for centralized 2PC with N participants).
 
-2. **Work time is constant** (~100ms) regardless of network
+2. **Work time is constant** (~71–111ms) regardless of network
    conditions — the database operations are not the bottleneck.
 
-3. **Cost of Coordination rises sharply**: 9.3% (Local) →
-   79.8% (Regional) → 94.9% (Global). At Trans-Atlantic latency,
-   a transaction spends 19× more time waiting for the network
+3. **Cost of Coordination rises sharply**: 11.4% (Local) →
+   81.7% (Regional) → 94.7% (Global). At Trans-Atlantic latency,
+   a transaction spends ~18× more time waiting for the network
    than doing useful work.
 
 4. **2PC guarantees Atomicity** under failure: timeout detection

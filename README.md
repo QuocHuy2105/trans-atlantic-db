@@ -27,12 +27,12 @@ of total transaction time is spent *waiting for the network* versus
 
 | Profile  | Latency | Mean      | Median    | P99       | CoordCost |
 |----------|---------|-----------|-----------|-----------|-----------|
-| Local    | 1ms     | 93.2ms    | 96.6ms    | 127.9ms   | 9.3%      |
-| Regional | 50ms    | 501.7ms   | 507.1ms   | 540.0ms   | 79.8%     |
-| Global   | 250ms   | 2106.6ms  | 2111.3ms  | 2133.1ms  | 94.9%     |
+| Local    | 1ms     | 79.4ms    | 77.0ms    | 125.3ms   | 11.4%     |
+| Regional | 50ms    | 490.4ms   | 491.0ms   | 526.8ms   | 81.7%     |
+| Global   | 250ms   | 2111.2ms  | 2113.4ms  | 2135.5ms  | 94.7%     |
 
 > At Trans-Atlantic latency (250ms), a transaction spends
-> **94.9% of its time waiting for the network** — only 5.1%
+> **94.7% of its time waiting for the network** — only 5.3%
 > is actual database work.
 
 ---
@@ -237,11 +237,11 @@ With 2 participants and 8 messages per 2PC transaction:
 
 | Profile  | TMSG  | Comm Cost (8×TMSG) | Work Cost | Comm Dominance |
 |----------|-------|--------------------|-----------|----------------|
-| Local    | 1ms   | 8ms                | 85ms      | 9.3%           |
-| Regional | 50ms  | 400ms              | 102ms     | 79.8%          |
-| Global   | 250ms | 2000ms             | 107ms     | 94.9%          |
+| Local    | 1ms   | 8ms                | 71ms      | 11.4%          |
+| Regional | 50ms  | 400ms              | 90ms      | 81.7%          |
+| Global   | 250ms | 2000ms             | 111ms     | 94.7%          |
 
-**Work cost is constant (~95ms) regardless of network conditions.**
+**Work cost is constant (~71–111ms) regardless of network conditions.**
 Communication cost increases 250× from Local to Global.
 
 ---
