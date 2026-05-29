@@ -104,7 +104,7 @@ trans-atlantic-db/
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/YOUR_USERNAME/trans-atlantic-db.git
+git clone https://github.com/QuocHuy2105/trans-atlantic-db.git
 cd trans-atlantic-db
 
 # 2. Create virtual environment
